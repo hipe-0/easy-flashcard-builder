@@ -1,0 +1,36 @@
+{
+  "appId": "my-flashcards-001",
+  "appName": "Easy Flashcard Builder",
+  "version": "1.00",
+  "deckTitle": "European Countries & Capitals",
+  "deckDescription": "Master all 48 European countries and their capitals through spaced repetition. Each card includes a map for visual recognition.",
+  "dailyNewLimit": 20,
+  "dailyDueCardsLimit": 40,
+  "maxReviewsPerSession": 100,
+  "maxCardsToRehearse": 10,
+  "extraCardsOnComplete": 5,
+  "gradeTimings": { "noidea": 60, "vague": 60, "almost": 30, "hard": 180, "good": 86400, "easy": 345600 },
+  "storageKeyPrefix": "fc_",
+  "colors": {
+    "primary": "#1a5276",
+    "primaryHover": "#154360",
+    "background": "#f0ece3",
+    "cardBackground": "#fefcf7",
+    "text": "#1c2833",
+    "textMuted": "#7d8e9c",
+    "border": "#e1d5c0",
+    "success": "#2e8b57",
+    "warning": "#c9952e",
+    "danger": "#c0392b",
+    "shadow": "rgba(28,40,51,0.07)",
+    "darkMode": {
+      "primary": "#5dade2",
+      "background": "#1c232e",
+      "cardBackground": "#232b38",
+      "text": "#eaedef",
+      "textMuted": "#85929e",
+      "border": "#34495e",
+      "shadow": "rgba(0,0,0,0.3)"
+    }
+  }
+}

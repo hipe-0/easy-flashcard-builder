@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <title>Flashcards</title>
+  <link rel="icon" href="favicon.ico">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <noscript>
+    <div class="panel">
+      <h1>JavaScript required</h1>
+      <p>This flashcard app requires JavaScript to be enabled in your browser.</p>
+    </div>
+  </noscript>
+
+  <section id="splash" class="view" aria-label="Splash">
+    <div class="panel">
+      <button id="btn-settings" class="btn-settings" type="button" title="Settings" aria-label="Open settings">&#9881;&#65039;</button>
+      <div class="title-row">
+        <img class="deck-icon" src="favicon.ico" alt="" width="32" height="32">
+        <h1 id="deck-title">Deck Title</h1>
+      </div>
+      <div class="deck-subtitle">
+        <span><span id="splash-card-count">0</span> cards</span>
+        <span id="splash-completed-text">0% completed</span>
+      </div>
+      <p id="deck-description" class="deck-description"></p>
+      <div id="corrupted-msg" class="error" hidden>
+        Progress data corrupted &mdash; click "Reset Progress" to start fresh.
+      </div>
+      <p id="splash-status-text" class="status-text"></p>
+      <div class="actions">
+        <button id="btn-start" class="btn btn-primary" type="button" title="Start or resume today's study session">Start Studying</button>
+      </div>
+      <div class="progress-header">
+        <span>Today's Progress</span>
+        <span id="splash-progress-text">0/0 cards</span>
+        <span class="streak-inline">Streak <span id="splash-streak-text">0</span> days</span>
+      </div>
+      <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+        <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+      </div>
+    </div>
+    <div id="settings-backdrop" class="modal-backdrop" hidden>
+      <div class="modal" role="dialog" aria-label="Settings">
+        <div class="modal-header">
+          <h2>Settings</h2>
+          <button id="btn-close-settings" class="btn-close-settings" type="button" aria-label="Close settings">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="settings-section">
+            <div class="settings-label">Appearance</div>
+            <p class="settings-desc">Switch between light, dark, and automatic theme.</p>
+            <button id="btn-settings-theme" class="btn" type="button" title="Click to cycle theme">Auto</button>
+          </div>
+          <div class="settings-section" id="settings-rehearse-section">
+            <div class="settings-label">Rehearsal</div>
+            <p class="settings-desc">Practice cards you've already seen without affecting their SRS schedule.</p>
+            <button id="btn-settings-rehearse" class="btn" type="button" title="Rehearse already reviewed cards">Rehearse Already Reviewed</button>
+          </div>
+          <div class="settings-section" id="settings-add-more-section">
+            <div class="settings-label">Extra Cards</div>
+            <p class="settings-desc">Pull in unseen cards beyond the daily limit to study now.</p>
+            <button id="btn-settings-add-more" class="btn" type="button" title="Pull in unseen cards">Add more cards</button>
+          </div>
+          <div class="settings-section">
+            <div class="settings-label">Data</div>
+            <p class="settings-desc">Erase all card progress, daily counters, and streak to start fresh.</p>
+            <button id="btn-settings-reset" class="btn btn-danger" type="button" title="Reset all progress">Reset Progress</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="splash-footer">
+      <span id="footer-title">Deck</span> &middot; <span id="footer-version">v1.0.0</span>
+    </div>
+  </section>
+
+  <section id="study" class="view" aria-label="Study">
+    <header>
+      <button id="btn-close-session" class="btn btn-close" type="button" title="End session and return to splash" aria-label="End session">&times;</button>
+      <h2 id="deck-title-study">Deck Title</h2>
+      <button id="btn-theme" class="btn btn-icon" type="button" title="Toggle theme (D)" aria-label="Toggle dark mode">🌙</button>
+      <span class="header-meta" role="status" aria-live="polite" id="progress-text">0/0 cards remaining (0 new)</span>
+      <span id="rehearsal-badge" class="badge" hidden>Rehearsal</span>
+    </header>
+    <div class="card-container">
+      <div class="card" id="card" tabindex="0" aria-label="Flashcard (press Space to flip, then 1-6 to grade)">
+        <div class="card-face card-front" id="card-front" aria-hidden="false">
+          <div id="card-front-content"></div>
+        </div>
+        <div class="card-face card-back" id="card-back" aria-hidden="true">
+          <div class="card-back-question" id="card-back-question" aria-hidden="true"></div>
+          <div class="card-back-answer" id="card-back-answer"></div>
+        </div>
+      </div>
+    </div>
+    <button id="btn-show-answer" class="btn btn-primary" type="button" title="Reveal the answer (Space)" aria-label="Show answer" hidden>Show answer</button>
+    <div class="grades hidden" id="grades" role="group" aria-label="Grade your recall">
+      <button id="grade-0" class="btn btn-grade-0" type="button" title="No memory of the answer, never seen or completely blanked">No Idea</button>
+      <button id="grade-1" class="btn btn-grade-1" type="button" title="Familiar feeling but couldn't produce the answer">Vague</button>
+      <button id="grade-2" class="btn btn-grade-2" type="button" title="Tip of the tongue, nearly got it right">Almost</button>
+      <button id="grade-3" class="btn btn-grade-3" type="button" title="Correct but difficult, required effort">Hard</button>
+      <button id="grade-4" class="btn btn-grade-4" type="button" title="Correct, normal recall">Good</button>
+      <button id="grade-5" class="btn btn-grade-5" type="button" title="Correct, effortless, instant recall">Easy</button>
+    </div>
+  </section>
+
+  <script src="assets/app.js"></script>
+</body>
+</html>
