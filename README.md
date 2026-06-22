@@ -1,6 +1,15 @@
-# Flashcards
+# Easy Flashcard Builder 🧠✨
 
-A **zero-dependency** flash card app using SM-2 spaced repetition. Everything is in a single `index.html` — no build tools, no server, no external files except map images.
+A **zero-dependency** flashcard app using **SM-2 spaced repetition** ⏱️📚.
+
+## Features ✅
+
+- **Proven algorithm**: Spaced repetition with the scientifically proven **SM-2** algorithm makes learning smoother and more effective 🎯🧠.
+- **Simple deployment**: Everything lives in a single `index.html`—no build tools, no server, no installation, no dependencies, and no external files except the images shown on the cards 🚀📄.
+- **Anonymous by design**: No data transits through the web, no online logging, and no traceability 🔒🌐🚫.
+- **Local by design**: Your progress is saved in your browser via `localStorage` 💾🧩. Deleting your browser cache deletes all progress 🗑️📉.
+
+The app is pre-filled with an example set of cards on **European countries** 🇪🇺🌍—but you can easily create your own 🛠️😊.
 
 ## Quick start
 
@@ -13,7 +22,7 @@ A **zero-dependency** flash card app using SM-2 spaced repetition. Everything is
 ```
 flashcards-app/
 ├── index.html           # Standalone app (HTML + CSS + JS + config + cards)
-├── favicon.ico          # Tab icon
+├── app-icon.png         # Tab icon
 ├── README.md            # This file
 └── assets/
     └── images/maps/     # Country map SVGs (48 files)
@@ -45,6 +54,7 @@ Right below `APP_CONFIG` in the same `<script>` block, the `CARDS` array holds e
 ```
 
 To change the deck, edit this array. Use **single quotes** for HTML attributes to avoid escaping issues.
+The sequence of questions is **not** randomized by default, so it's recommended to space-out similar cards by about 4 cards for variety, 
 
 ## Grade system
 
