@@ -4,10 +4,11 @@
 <script>
 // ===== CONFIGURATION - EDIT HERE =====
 // Edit deck info, daily limits, timing, and storage below.
+const APP_NAME = "Easy Flashcard Builder";
+const APP_VERSION = "1.00";
+const APP_REPO = "https://github.com/hipe-0/easy-flashcard-builder";
 const APP_CONFIG = {
   "appId": "my-flashcards-001",
-  "appName": "Easy Flashcard Builder",
-  "version": "1.00",
   "deckTitle": "European Countries & Capitals",
   "deckDescription": "Master all 48 European countries and their capitals through spaced repetition. Each card includes a map for visual recognition.",
   "dailyNewLimit": 20,
@@ -291,6 +292,12 @@ button { font: inherit; }
   margin-bottom: var(--space-1);
 }
 .deck-icon {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border-radius: 4px;
+}
+.deck-icon-lg {
   width: 58px;
   height: 58px;
   flex-shrink: 0;
@@ -684,7 +691,7 @@ button { font: inherit; }
     <div class="panel">
       <button id="btn-settings" class="btn-settings" type="button" title="Settings" aria-label="Open settings">&#9881;&#65039;</button>
       <div class="title-row">
-        <img class="deck-icon" src="EasyFlashcardBuilder.png" alt="" width="58" height="58">
+        <img class="deck-icon-lg" src="EasyFlashcardBuilder.png" alt="" width="58" height="58">
         <h1 id="deck-title">Deck Title</h1>
       </div>
       <div class="deck-subtitle">
@@ -739,13 +746,14 @@ button { font: inherit; }
       </div>
     </div>
     <div class="splash-footer">
-      <span id="footer-title">Deck</span> &middot; <span id="footer-version">v1.0.0</span>
+      <a href="" id="footer-link" target="_blank" rel="noopener"><span id="footer-title">Deck</span></a> &middot; <span id="footer-version">v1.0.0</span> &mdash; <span id="footer-tagline">free &amp; open-source</span>
     </div>
   </section>
 
   <section id="study" class="view" aria-label="Study">
     <header>
       <button id="btn-close-session" class="btn btn-close" type="button" title="End session and return to splash" aria-label="End session">&times;</button>
+      <img class="deck-icon" src="EasyFlashcardBuilder.png" alt="" width="32" height="32">
       <h2 id="deck-title-study">Deck Title</h2>
       <button id="btn-theme" class="btn btn-icon" type="button" title="Toggle theme (D)" aria-label="Toggle dark mode">&#127769;</button>
       <span class="header-meta" role="status" aria-live="polite" id="progress-text">0/0 cards remaining (0 new)</span>
@@ -1279,8 +1287,9 @@ function renderSplash() {
   const splashStats = appState.engine.computeSplashStats();
   document.getElementById('deck-title').textContent = appState.config.deckTitle;
   document.getElementById('splash-card-count').textContent = appState.cards.length;
-  document.getElementById('footer-title').textContent = appState.config.appName || appState.config.deckTitle;
-  document.getElementById('footer-version').textContent = appState.config.version ? 'v' + appState.config.version : 'v' + (appState.engine.meta.version || SCHEMA_VERSION);
+  document.getElementById('footer-title').textContent = APP_NAME || appState.config.deckTitle;
+  document.getElementById('footer-version').textContent = 'v' + (APP_VERSION || appState.engine.meta.version || SCHEMA_VERSION);
+  document.getElementById('footer-link').href = APP_REPO || '#';
 
   const corrupted = !!appState.engine._corrupted;
   document.getElementById('corrupted-msg').hidden = !corrupted;
