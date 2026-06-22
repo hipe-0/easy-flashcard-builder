@@ -11,6 +11,10 @@ A **zero-dependency** flashcard app using **SM-2 spaced repetition** ⏱️📚.
 
 The app is pre-filled with an example set of cards on **European countries** 🇪🇺🌍—but you can easily create your own 🛠️😊.
 
+<img height="200" alt="2026-06-22 18_41_54-Flashcard builder icon - DuckDuckGo" src="https://github.com/user-attachments/assets/2a0629e2-d43e-4349-8bc2-82e6ba2acf56" />
+<img height="200" alt="2026-06-22 18_41_25-Flashcard builder icon - DuckDuckGo" src="https://github.com/user-attachments/assets/8cde2025-3a20-4777-b86c-b073cc9dcb15" />
+<img height="200" alt="2026-06-22 18_44_38-Bureau _ Explorateur de fichiers" src="https://github.com/user-attachments/assets/ac5cc5ee-ea3f-4d31-b936-5bee2cee40ce" />
+
 ## Quick start
 
 1. Open `index.html` in a browser — splash appears, click **Start Studying**.
