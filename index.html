@@ -104,23 +104,23 @@ const CARDS = [
 <link rel="icon" href="app-icon.png" type="image/png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800;900&display=swap" rel="stylesheet">
 <style>
 :root {
-  --primary: #1a5276;
-  --primary-hover: #154360;
-  --primary-light: #eaf4f9;
-  --bg: #f0ece3;
-  --card-bg: #fefcf7;
-  --text: #1c2833;
-  --text-muted: #7d8e9c;
-  --border: #e1d5c0;
-  --success: #2e8b57;
-  --warning: #c9952e;
-  --danger: #c0392b;
-  --shadow: rgba(28, 40, 51, 0.07);
-  --radius: 12px;
-  --radius-sm: 8px;
+  --primary: #000000;
+  --primary-hover: #333333;
+  --primary-light: #f0f0f0;
+  --bg: #E5E8ED;
+  --card-bg: #FFFFFF;
+  --text: #51585D;
+  --text-muted: #6B7278;
+  --border: #BDC4CA;
+  --accent: #FFD000;
+  --success: #2E7D32;
+  --warning: #E67E22;
+  --danger: #C0392B;
+  --radius: 0px;
+  --radius-sm: 0px;
   --space-1: .25rem;
   --space-2: .5rem;
   --space-3: 1rem;
@@ -130,46 +130,49 @@ const CARDS = [
 
 @media (prefers-color-scheme: dark) {
   :root:not(.light) {
-    --primary: #5dade2;
-    --primary-hover: #85c1e9;
-    --primary-light: #1a2b3c;
-    --bg: #1c232e;
-    --card-bg: #232b38;
-    --text: #eaedef;
-    --text-muted: #85929e;
-    --border: #34495e;
-    --success: #2ecc71;
-    --warning: #d4ac0d;
-    --danger: #e74c3c;
-    --shadow: rgba(0, 0, 0, 0.3);
+    --primary: #FFFFFF;
+    --primary-hover: #CCCCCC;
+    --primary-light: #2a2a2a;
+    --bg: #1a1a1a;
+    --card-bg: #252525;
+    --text: #CCCCCC;
+    --text-muted: #888888;
+    --border: #444444;
+    --accent: #FFD000;
+    --success: #4CAF50;
+    --warning: #FF9800;
+    --danger: #F44336;
   }
 }
 
 html.dark {
-  --primary: #5dade2;
-  --primary-hover: #85c1e9;
-  --primary-light: #1a2b3c;
-  --bg: #1c232e;
-  --card-bg: #232b38;
-  --text: #eaedef;
-  --text-muted: #85929e;
-  --border: #34495e;
-  --success: #2ecc71;
-  --warning: #d4ac0d;
-  --danger: #e74c3c;
-  --shadow: rgba(0, 0, 0, 0.3);
+  --primary: #FFFFFF;
+  --primary-hover: #CCCCCC;
+  --primary-light: #2a2a2a;
+  --bg: #1a1a1a;
+  --card-bg: #252525;
+  --text: #CCCCCC;
+  --text-muted: #888888;
+  --border: #444444;
+  --accent: #FFD000;
+  --success: #4CAF50;
+  --warning: #FF9800;
+  --danger: #F44336;
 }
 
 html.light {
-  --primary: #1a5276;
-  --primary-hover: #154360;
-  --primary-light: #eaf4f9;
-  --bg: #f0ece3;
-  --card-bg: #fefcf7;
-  --text: #1c2833;
-  --text-muted: #7d8e9c;
-  --border: #e1d5c0;
-  --shadow: rgba(28, 40, 51, 0.07);
+  --primary: #000000;
+  --primary-hover: #333333;
+  --primary-light: #f0f0f0;
+  --bg: #E5E8ED;
+  --card-bg: #FFFFFF;
+  --text: #51585D;
+  --text-muted: #6B7278;
+  --border: #BDC4CA;
+  --accent: #FFD000;
+  --success: #2E7D32;
+  --warning: #E67E22;
+  --danger: #C0392B;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -184,7 +187,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-h1, h2, h3 { margin: 0 0 var(--space-3); line-height: 1.25; font-family: "Playfair Display", Georgia, "Times New Roman", serif; font-weight: 700; letter-spacing: -.01em; }
+h1, h2, h3 { margin: 0 0 var(--space-3); line-height: 1.2; font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-weight: 800; letter-spacing: -.02em; }
 p { margin: 0 0 var(--space-3); }
 img, video, audio { max-width: 100%; height: auto; }
 button { font: inherit; }
@@ -279,11 +282,9 @@ button { font: inherit; }
   background: var(--card-bg);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  box-shadow: 0 6px 20px var(--shadow);
   padding: var(--space-5) var(--space-5) var(--space-4);
   max-width: 480px;
   width: 100%;
-  transition: box-shadow .2s;
 }
 .title-row {
   display: flex;
@@ -306,8 +307,8 @@ button { font: inherit; }
 #splash h1 {
   font-size: 1.6rem;
   margin-bottom: 0;
-  font-family: "Playfair Display", Georgia, "Times New Roman", serif;
-  font-weight: 700;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-weight: 800;
   letter-spacing: -.02em;
 }
 .deck-description {
@@ -365,9 +366,8 @@ button { font: inherit; }
   border-color: var(--primary);
   color: #fff;
   font-weight: 600;
-  box-shadow: 0 1px 3px rgba(0,0,0,.15);
 }
-.btn-primary:hover { background: var(--primary-hover); border-color: var(--primary-hover); box-shadow: 0 2px 6px rgba(0,0,0,.2); }
+.btn-primary:hover { background: var(--primary-hover); border-color: var(--primary-hover); }
 .btn-danger { color: var(--danger); }
 .btn-danger:hover { background: var(--danger); color: #fff; border-color: var(--danger); }
 .btn-icon { padding: .35rem .6rem; line-height: 1; min-width: 2.25rem; }
@@ -386,7 +386,7 @@ button { font: inherit; }
   z-index: 5;
   transition: color .2s, background .2s;
 }
-.btn-settings:hover { color: var(--text); background: var(--border); }
+.btn-settings:hover { color: var(--accent); background: var(--border); }
 .btn-success {
   background: var(--success);
   border-color: var(--success);
@@ -394,18 +394,18 @@ button { font: inherit; }
 }
 .btn-success:hover { background: #239b56; border-color: #239b56; }
 
-.btn-grade-0 { background: #c0392b; border-color: #c0392b; color: #fff; }
-.btn-grade-0:hover { background: #a93226; border-color: #a93226; }
-.btn-grade-1 { background: #e67e22; border-color: #e67e22; color: #fff; }
-.btn-grade-1:hover { background: #ca6f1e; border-color: #ca6f1e; }
-.btn-grade-2 { background: #f39c12; border-color: #f39c12; color: #fff; }
-.btn-grade-2:hover { background: #d68910; border-color: #d68910; }
-.btn-grade-3 { background: #2ecc71; border-color: #2ecc71; color: #fff; }
-.btn-grade-3:hover { background: #27ae60; border-color: #27ae60; }
-.btn-grade-4 { background: #27ae60; border-color: #27ae60; color: #fff; }
-.btn-grade-4:hover { background: #1e8449; border-color: #1e8449; }
-.btn-grade-5 { background: #1e7e34; border-color: #1e7e34; color: #fff; }
-.btn-grade-5:hover { background: #196f2d; border-color: #196f2d; }
+.btn-grade-0 { background: #6B7278; border-color: #6B7278; color: #fff; }
+.btn-grade-0:hover { background: #51585D; border-color: #51585D; }
+.btn-grade-1 { background: #6B7278; border-color: #6B7278; color: #fff; }
+.btn-grade-1:hover { background: #51585D; border-color: #51585D; }
+.btn-grade-2 { background: #6B7278; border-color: #6B7278; color: #fff; }
+.btn-grade-2:hover { background: #51585D; border-color: #51585D; }
+.btn-grade-3 { background: var(--accent); border-color: var(--accent); color: #000; }
+.btn-grade-3:hover { background: #E6BB00; border-color: #E6BB00; }
+.btn-grade-4 { background: var(--accent); border-color: var(--accent); color: #000; }
+.btn-grade-4:hover { background: #E6BB00; border-color: #E6BB00; }
+.btn-grade-5 { background: var(--accent); border-color: var(--accent); color: #000; }
+.btn-grade-5:hover { background: #E6BB00; border-color: #E6BB00; }
 .status-text {
   color: var(--text-muted);
   font-size: .875rem;
@@ -439,8 +439,7 @@ button { font: inherit; }
 }
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--primary), #5dade2);
-  border-radius: 999px;
+  background: var(--accent);
   transition: width .4s ease;
 }
 
@@ -453,9 +452,9 @@ button { font: inherit; }
 }
 #study header h2 {
   flex: 1;
-  font-family: "Playfair Display", Georgia, "Times New Roman", serif;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   font-size: 1.1rem;
-  font-weight: 700;
+  font-weight: 800;
   margin: 0;
   white-space: nowrap;
   overflow: hidden;
@@ -464,10 +463,9 @@ button { font: inherit; }
 }
 .header-meta { color: var(--text-muted); font-size: .8rem; font-weight: 500; }
 .badge {
-  background: var(--warning);
-  color: #fff;
+  background: var(--accent);
+  color: #000;
   padding: .125rem .5rem;
-  border-radius: 999px;
   font-size: .7rem;
   font-weight: 600;
   letter-spacing: .02em;
@@ -540,7 +538,6 @@ button { font: inherit; }
   background: var(--card-bg);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  box-shadow: 0 4px 16px var(--shadow);
   padding: var(--space-5) var(--space-4);
   display: flex;
   align-items: center;
@@ -602,7 +599,6 @@ button { font: inherit; }
   background: var(--card-bg);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  box-shadow: 0 12px 40px var(--shadow);
   max-width: 420px;
   width: 90%;
   max-height: 80vh;
@@ -653,7 +649,7 @@ button { font: inherit; }
   cursor: pointer;
   transition: color .15s, border-color .15s;
 }
-.btn-close-settings:hover { color: var(--danger); border-color: var(--danger); }
+.btn-close-settings:hover { color: var(--accent); border-color: var(--accent); }
 
 @media (max-width: 640px) {
   .view { padding: var(--space-2); }
