@@ -4,7 +4,7 @@ A **zero-dependency** flashcard app using **SM-2 spaced repetition** ⏱️📚.
 
 ## Features ✅
 
-- **Proven algorithm**: Spaced repetition with the scientifically proven **SM-2** algorithm makes learning smoother and more effective 🎯🧠.
+- **Proven algorithm**: Spaced repetition with the scientifically proven **SM-2** algorithm makes learning smoother and more effective (https://en.wikipedia.org/wiki/SuperMemo) 🎯🧠.
 - **Simple deployment**: Everything lives in a single `index.html`—no build tools, no server, no installation, no dependencies, and no external files except the images shown on the cards 🚀📄.
 - **Anonymous by design**: No data transits through the web, no online logging, and no traceability 🔒🌐🚫.
 - **Local by design**: Your progress is saved in your browser via `localStorage` 💾🧩. Deleting your browser cache deletes all progress 🗑️📉.
