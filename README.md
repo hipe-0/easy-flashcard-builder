@@ -1,6 +1,6 @@
 # Flashcards
 
-A **zero-dependency** flash card app using SM-2 spaced repetition. Each app instance = one deck. Deploy by copying the folder to any static host (GitHub Pages, Netlify, Vercel, Cloudflare Pages, etc.) or open via `file://`.
+A **zero-dependency** flash card app using SM-2 spaced repetition. Everything is in a single `index.html` — no build tools, no server, no external files except map images.
 
 ## Quick start
 
@@ -12,22 +12,16 @@ A **zero-dependency** flash card app using SM-2 spaced repetition. Each app inst
 
 ```
 flashcards-app/
-├── index.html           # Entry point
-├── config.json          # Deck title, daily limits, colors, grade timings
-├── cards.csv            # Question,Answer columns (HTML allowed)
+├── index.html           # Standalone app (HTML + CSS + JS + config + cards)
 ├── favicon.ico          # Tab icon
-├── server.cjs           # Optional local dev server (node server.cjs)
 ├── README.md            # This file
-├── assets/
-│   ├── app.js           # App logic (SM-2 engine, UI, state)
-│   ├── style.css        # All styles (light + dark themes)
-│   └── images/
-│       └── maps/        # Country map SVGs for card images
-└── tests/
-    └── test-sm2.cjs     # SM-2 engine unit tests
+└── assets/
+    └── images/maps/     # Country map SVGs (48 files)
 ```
 
-## Configuration (`config.json`)
+## Configuration (`APP_CONFIG`)
+
+Open `index.html` — the first `<script>` block contains `APP_CONFIG` with these fields:
 
 | Key | Type | Notes |
 |-----|------|-------|
@@ -40,22 +34,17 @@ flashcards-app/
 | `extraCardsOnComplete` | number | Bonus cards shown when daily queue is done. |
 | `gradeTimings` | object | Per-grade delay in seconds before re-queue (e.g. `"noidea": 60`). |
 | `storageKeyPrefix` | string | Prefix for `localStorage` keys (default `fc_`). |
-| `colors` | object | Light palette + optional `darkMode` palette. All fields override CSS variables. |
 
-`colors` keys: `primary`, `primaryHover`, `background`, `cardBackground`, `text`, `textMuted`, `border`, `success`, `warning`, `danger`, `shadow`, `darkMode: { primary, background, cardBackground, text, textMuted, border, shadow }`.
+## Card data (`CARDS`)
 
-## CSV format (`cards.csv`)
+Right below `APP_CONFIG` in the same `<script>` block, the `CARDS` array holds every card as `{ question, answer }`. HTML is allowed in both fields.
 
-Two columns: `Question,Answer`. HTML is allowed in both.
-
-```csv
-Question,Answer
-"Capital of France?","Paris"
-"<img src='assets/images/maps/BE.svg' alt='' style='max-width:100%'>","Belgium"
-"<h2>Welcome</h2><p>Press Space to flip.</p>","<p>Answer side supports <strong>HTML</strong>.</p>"
+```js
+{ question: "Capital of France?", answer: "Paris" },
+{ question: "<img src='assets/images/maps/BE.svg'>", answer: "Belgium" },
 ```
 
-**Quoting rules:** Wrap fields containing commas in double quotes. Use **single quotes** for HTML attributes inside quoted fields so they don't conflict with CSV double quotes.
+To change the deck, edit this array. Use **single quotes** for HTML attributes to avoid escaping issues.
 
 ## Grade system
 
@@ -90,7 +79,7 @@ Grades 1-3 reset SM-2 progress (repetitions, ease). Grades 4-6 advance it. Grade
 The whole folder is a self-contained static site. Drop it on any host.
 
 ### GitHub Pages
-Push the folder to a repo. Settings → Pages → Source: `main` branch, root.
+Push to a repo. Settings → Pages → Source: `main` branch, root.
 
 ### Netlify
 Go to <https://app.netlify.com/drop>, drag the folder.
@@ -104,14 +93,17 @@ npx vercel --prod
 ### Cloudflare Pages
 Dashboard → Pages → Create → Direct Upload. Drag the folder.
 
+### SharePoint
+Upload `index.html` + `assets/` folder to a SharePoint document library. No server-side config needed.
+
 ### `file://` (local)
-Double-click `index.html`. Works in Firefox. **Chrome blocks `fetch()` for `file://`** — run `node server.cjs` or `npx http-server` locally.
+Double-click `index.html`. Works in any browser.
 
 ## How to create a new deck
 
-1. **Copy the whole folder** to a new location.
-2. In `config.json`: change `appId` (unique per deck), `deckTitle`, and adjust limits/colors.
-3. Replace `cards.csv` with your own `Question,Answer` rows.
+1. **Copy `index.html`** to a new location.
+2. Change `appId` (unique per deck for separate `localStorage`), `deckTitle`, and limits.
+3. Edit or replace the `CARDS` array with your own question/answer pairs.
 4. Drop images into `assets/images/`.
 5. Open `index.html` or deploy.
 
@@ -126,13 +118,13 @@ Keys prefixed with `config.storageKeyPrefix` (default `fc_`):
 | `<prefix>cards` | `[{id, ease, intervalDaysUntilNextReview, repetitionsOfSuccess, dueDateOfNextReview, lapsesOfFailed, lastReview, lastGrade}]` |
 | `<prefix>stats` | `{totalReviews, streakDays, lastStudyDate, newToday, dueToday, lastDay}` |
 | `<prefix>settings` | `{darkMode: "auto"\|"light"\|"dark"}` |
-| `<prefix>meta` | `{created, version, csvHash}` |
+| `<prefix>meta` | `{created, version, cardHash}` |
 
-CSV SHA-256 hash is stored in `meta.csvHash`. When the CSV changes, SRS state resets automatically while keeping stats and settings.
+`meta.cardHash` is a hash of the embedded `CARDS` array. When the card data changes, SRS state resets automatically while keeping stats and settings.
 
 ## Browser support
 
-Latest Chrome, Firefox, Edge, Safari (desktop + mobile). Requires `fetch`, `crypto.subtle`, `localStorage`, and CSS Grid.
+Any browser with `localStorage` and CSS Grid — Chrome, Firefox, Edge, Safari (desktop + mobile). Works on `file://`, SharePoint, and strict CSP environments. No `fetch()` or `crypto.subtle` required.
 
 ## License
 

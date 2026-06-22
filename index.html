@@ -1,15 +1,677 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="color-scheme" content="light dark">
-  <title>Flashcards</title>
-  <link rel="icon" href="favicon.ico">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css">
+<script>
+// ===== CONFIGURATION - EDIT HERE =====
+// Edit deck info, daily limits, timing, and storage below.
+const APP_CONFIG = {
+  "appId": "my-flashcards-001",
+  "appName": "Easy Flashcard Builder",
+  "version": "1.00",
+  "deckTitle": "European Countries & Capitals",
+  "deckDescription": "Master all 48 European countries and their capitals through spaced repetition. Each card includes a map for visual recognition.",
+  "dailyNewLimit": 20,
+  "dailyDueCardsLimit": 40,
+  "maxReviewsPerSession": 100,
+  "maxCardsToRehearse": 10,
+  "extraCardsOnComplete": 5,
+  "gradeTimings": { "noidea": 60, "vague": 60, "almost": 30, "hard": 180, "good": 86400, "easy": 345600 },
+  "storageKeyPrefix": "fc_"
+};
+
+// Edit card content below. Each entry: { question: "...", answer: "..." }
+const CARDS = [
+  { question: "Which country has <strong>Reykjavik</strong> as its capital?", answer: "Iceland" },
+  { question: "What's the capital of <strong>Ireland</strong>?", answer: "Dublin" },
+  { question: "What country is this?<br><br><img src='assets/images/maps/GB.svg' alt='' style='width:100%;height:auto;display:block;margin:0 auto'>", answer: "United Kingdom" },
+  { question: "What's the capital of <strong>Hungary</strong>?", answer: "Budapest" },
+  { question: "What's the capital of <strong>Iceland</strong>?", answer: "Reykjavik" },
+  { question: "What country is this?<br><br><img src='assets/images/maps/IE.svg' alt='' style='width:100%;height:auto;display:block;margin:0 auto'>", answer: "Ireland" },
+  { question: "Which country has <strong>London</strong> as its capital?", answer: "United Kingdom" },
+  { question: "What country is this?<br><br><img src='assets/images/maps/HU.svg' alt='' style='width:100%;height:auto;display:block;margin:0 auto'>", answer: "Hungary" },
+  { question: "What country is this?<br><br><img src='assets/images/maps/IS.svg' alt='' style='width:100%;height:auto;display:block;margin:0 auto'>", answer: "Iceland" },
+  { question: "Which country has <strong>Dublin</strong> as its capital?", answer: "Ireland" },
+  { question: "What's the capital of <strong>United Kingdom</strong>?", answer: "London" },
+  { question: "Which country has <strong>Budapest</strong> as its capital?", answer: "Hungary" },
+  { question: "What country is this?<br><br><img src='assets/images/maps/PT.svg' alt='' style='width:100%;height:auto;display:block;margin:0 auto'>", answer: "Portugal" },
+  { question: "Which country has <strong>Brussels</strong> as its capital?", answer: "Belgium" },
+  { question: "What country is this?<br><br><img src='assets/images/maps/RS.svg' alt='' style='width:100%;height:auto;display:block;margin:0 auto'>", answer: "Serbia" },
+  { question: "Which country has <strong>Amsterdam</strong> as its capital?", answer: "Netherlands" },
+  { question: "What's the capital of <strong>Portugal</strong>?", answer: "Lisbon" },
+  { question: "What's the capital of <strong>Belgium</strong>?", answer: "Brussels" },
+  { question: "What's the capital of <strong>Serbia</strong>?", answer: "Belgrade" },
+  { question: "What's the capital of <strong>Netherlands</strong>?", answer: "Amsterdam" },
+  { question: "Which country has <strong>Lisbon</strong> as its capital?", answer: "Portugal" },
+  { question: "What country is this?<br><br><img src='assets/images/maps/BE.svg' alt='' style='width:100%;height:auto;display:block;margin:0 auto'>", answer: "Belgium" },
+  { question: "Which country has <strong>Belgrade</strong> as its capital?", answer: "Serbia" },
+  { question: "What country is this?<br><br><img src='assets/images/maps/NL.svg' alt='' style='width:100%;height:auto;display:block;margin:0 auto'>", answer: "Netherlands" },
+  { question: "What's the capital of <strong>Spain</strong>?", answer: "Madrid" },
+  { question: "What country is this?<br><br><img src='assets/images/maps/HR.svg' alt='' style='width:100%;height:auto;display:block;margin:0 auto'>", answer: "Croatia" },
+  { question: "What's the capital of <strong>Romania</strong>?", answer: "Bucharest" },
+  { question: "What's the capital of <strong>Norway</strong>?", answer: "Oslo" },
+  { question: "Which country has <strong>Madrid</strong> as its capital?", answer: "Spain" },
+  { question: "What's the capital of <strong>Croatia</strong>?", answer: "Zagreb" },
+  { question: "What country is this?<br><br><img src='assets/images/maps/RO.svg' alt='' style='width:100%;height:auto;display:block;margin:0 auto'>", answer: "Romania" },
+  { question: "Which country has <strong>Oslo</strong> as its capital?", answer: "Norway" },
+  { question: "What country is this?<br><br><img src='assets/images/maps/ES.svg' alt='' style='width:100%;height:auto;display:block;margin:0 auto'>", answer: "Spain" },
+  { question: "Which country has <strong>Zagreb</strong> as its capital?", answer: "Croatia" },
+  { question: "Which country has <strong>Bucharest</strong> as its capital?", answer: "Romania" },
+  { question: "What country is this?<br><br><img src='assets/images/maps/NO.svg' alt='' style='width:100%;height:auto;display:block;margin:0 auto'>", answer: "Norway" },
+  { question: "What country is this?<br><br><img src='assets/images/maps/AT.svg' alt='' style='width:100%;height:auto;display:block;margin:0 auto'>", answer: "Austria" },
+  { question: "What country is this?<br><br><img src='assets/images/maps/IT.svg' alt='' style='width:100%;height:auto;display:block;margin:0 auto'>", answer: "Italy" },
+  { question: "Which country has <strong>Sofia</strong> as its capital?", answer: "Bulgaria" },
+  { question: "What's the capital of <strong>France</strong>?", answer: "Paris" },
+  { question: "Which country has <strong>Vienna</strong> as its capital?", answer: "Austria" },
+  { question: "Which country has <strong>Rome</strong> as its capital?", answer: "Italy" },
+  { question: "What's the capital of <strong>Bulgaria</strong>?", answer: "Sofia" },
+  { question: "What country is this?<br><br><img src='assets/images/maps/FR.svg' alt='' style='width:100%;height:auto;display:block;margin:0 auto'>", answer: "France" },
+  { question: "What's the capital of <strong>Austria</strong>?", answer: "Vienna" },
+  { question: "What's the capital of <strong>Italy</strong>?", answer: "Rome" },
+  { question: "What country is this?<br><br><img src='assets/images/maps/BG.svg' alt='' style='width:100%;height:auto;display:block;margin:0 auto'>", answer: "Bulgaria" },
+  { question: "Which country has <strong>Paris</strong> as its capital?", answer: "France" },
+  { question: "What country is this?<br><br><img src='assets/images/maps/FI.svg' alt='' style='width:100%;height:auto;display:block;margin:0 auto'>", answer: "Finland" },
+  { question: "What's the capital of <strong>Switzerland</strong>?", answer: "Bern" },
+  { question: "What country is this?<br><br><img src='assets/images/maps/PL.svg' alt='' style='width:100%;height:auto;display:block;margin:0 auto'>", answer: "Poland" },
+  { question: "What country is this?<br><br><img src='assets/images/maps/GR.svg' alt='' style='width:100%;height:auto;display:block;margin:0 auto'>", answer: "Greece" },
+  { question: "What's the capital of <strong>Finland</strong>?", answer: "Helsinki" },
+  { question: "What country is this?<br><br><img src='assets/images/maps/CH.svg' alt='' style='width:100%;height:auto;display:block;margin:0 auto'>", answer: "Switzerland" },
+  { question: "Which country has <strong>Warsaw</strong> as its capital?", answer: "Poland" },
+  { question: "What's the capital of <strong>Greece</strong>?", answer: "Athens" },
+  { question: "Which country has <strong>Helsinki</strong> as its capital?", answer: "Finland" },
+  { question: "Which country has <strong>Bern</strong> as its capital?", answer: "Switzerland" },
+  { question: "What's the capital of <strong>Poland</strong>?", answer: "Warsaw" },
+  { question: "Which country has <strong>Athens</strong> as its capital?", answer: "Greece" },
+  { question: "What country is this?<br><br><img src='assets/images/maps/DE.svg' alt='' style='width:100%;height:auto;display:block;margin:0 auto'>", answer: "Germany" },
+  { question: "What country is this?<br><br><img src='assets/images/maps/SE.svg' alt='' style='width:100%;height:auto;display:block;margin:0 auto'>", answer: "Sweden" },
+  { question: "What country is this?<br><br><img src='assets/images/maps/DK.svg' alt='' style='width:100%;height:auto;display:block;margin:0 auto'>", answer: "Denmark" },
+  { question: "Which country has <strong>Prague</strong> as its capital?", answer: "Czech Republic (Czechia)" },
+  { question: "What's the capital of <strong>Germany</strong>?", answer: "Bonn" },
+  { question: "What's the capital of <strong>Sweden</strong>?", answer: "Stockholm" },
+  { question: "What's the capital of <strong>Denmark</strong>?", answer: "Copenhagen" },
+  { question: "What's the capital of <strong>Czech Republic (Czechia)</strong>?", answer: "Prague" },
+  { question: "Which country has <strong>Bonn</strong> as its capital?", answer: "Germany" },
+  { question: "Which country has <strong>Stockholm</strong> as its capital?", answer: "Sweden" },
+  { question: "Which country has <strong>Copenhagen</strong> as its capital?", answer: "Denmark" },
+  { question: "What country is this?<br><br><img src='assets/images/maps/CZ.svg' alt='' style='width:100%;height:auto;display:block;margin:0 auto'>", answer: "Czechia" }
+];
+// ===== END CONFIGURATION =====
+</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>Flashcards</title>
+<link rel="icon" href="favicon.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #1a5276;
+  --primary-hover: #154360;
+  --primary-light: #eaf4f9;
+  --bg: #f0ece3;
+  --card-bg: #fefcf7;
+  --text: #1c2833;
+  --text-muted: #7d8e9c;
+  --border: #e1d5c0;
+  --success: #2e8b57;
+  --warning: #c9952e;
+  --danger: #c0392b;
+  --shadow: rgba(28, 40, 51, 0.07);
+  --radius: 12px;
+  --radius-sm: 8px;
+  --space-1: .25rem;
+  --space-2: .5rem;
+  --space-3: 1rem;
+  --space-4: 1.5rem;
+  --space-5: 2.5rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not(.light) {
+    --primary: #5dade2;
+    --primary-hover: #85c1e9;
+    --primary-light: #1a2b3c;
+    --bg: #1c232e;
+    --card-bg: #232b38;
+    --text: #eaedef;
+    --text-muted: #85929e;
+    --border: #34495e;
+    --success: #2ecc71;
+    --warning: #d4ac0d;
+    --danger: #e74c3c;
+    --shadow: rgba(0, 0, 0, 0.3);
+  }
+}
+
+html.dark {
+  --primary: #5dade2;
+  --primary-hover: #85c1e9;
+  --primary-light: #1a2b3c;
+  --bg: #1c232e;
+  --card-bg: #232b38;
+  --text: #eaedef;
+  --text-muted: #85929e;
+  --border: #34495e;
+  --success: #2ecc71;
+  --warning: #d4ac0d;
+  --danger: #e74c3c;
+  --shadow: rgba(0, 0, 0, 0.3);
+}
+
+html.light {
+  --primary: #1a5276;
+  --primary-hover: #154360;
+  --primary-light: #eaf4f9;
+  --bg: #f0ece3;
+  --card-bg: #fefcf7;
+  --text: #1c2833;
+  --text-muted: #7d8e9c;
+  --border: #e1d5c0;
+  --shadow: rgba(28, 40, 51, 0.07);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+html { height: 100%; }
+body {
+  min-height: 100%;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+h1, h2, h3 { margin: 0 0 var(--space-3); line-height: 1.25; font-family: "Playfair Display", Georgia, "Times New Roman", serif; font-weight: 700; letter-spacing: -.01em; }
+p { margin: 0 0 var(--space-3); }
+img, video, audio { max-width: 100%; height: auto; }
+button { font: inherit; }
+[hidden] { display: none !important; }
+.hidden { display: none !important; }
+
+.deck-subtitle {
+  color: var(--text-muted);
+  font-size: .85rem;
+  margin: -.25rem 0 1.25rem;
+  font-weight: 500;
+  display: flex;
+  justify-content: space-between;
+  letter-spacing: .02em;
+}
+
+.btn-close {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  line-height: 1;
+  padding: .15rem .55rem;
+  border-radius: 6px;
+}
+.btn-close:hover { color: var(--danger); border-color: var(--danger); }
+
+#btn-close-session {
+  position: absolute;
+  top: .35rem;
+  right: .35rem;
+  z-index: 5;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  font-size: 1.4rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--card-bg);
+  border-color: transparent;
+  transition: background .2s, border-color .2s;
+}
+#btn-close-session:hover { border-color: var(--border); background: var(--bg); }
+
+.card-back {
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+}
+.card-back-question {
+  width: 100%;
+  padding-bottom: var(--space-2);
+  border-bottom: 1px dashed var(--border);
+  color: var(--text-muted);
+  font-size: .9rem;
+  text-align: center;
+  max-height: 40%;
+  overflow: auto;
+}
+.card-back-question img {
+  max-height: 160px;
+  width: auto !important;
+  display: block;
+  margin: 0 auto;
+}
+.card-back-answer {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  overflow: auto;
+  font-size: 1.05rem;
+}
+
+.view {
+  display: none;
+  min-height: 100vh;
+  padding: var(--space-3);
+}
+.view.active { display: flex; }
+
+#splash { align-items: center; justify-content: center; flex-direction: column; gap: var(--space-4); }
+#study { flex-direction: column; gap: var(--space-3); max-width: 720px; margin: 0 auto; position: relative; padding-top: var(--space-5); height: 100vh; overflow: hidden; }
+
+.panel {
+  position: relative;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 6px 20px var(--shadow);
+  padding: var(--space-5) var(--space-5) var(--space-4);
+  max-width: 480px;
+  width: 100%;
+  transition: box-shadow .2s;
+}
+.title-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-1);
+}
+.deck-icon {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border-radius: 4px;
+}
+#splash h1 {
+  font-size: 1.6rem;
+  margin-bottom: 0;
+  font-family: "Playfair Display", Georgia, "Times New Roman", serif;
+  font-weight: 700;
+  letter-spacing: -.02em;
+}
+.deck-description {
+  font-size: .8rem;
+  color: var(--text-muted);
+  line-height: 1.55;
+  margin: -.4rem 0 var(--space-4);
+  max-width: 36ch;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2) var(--space-3);
+  margin: 0 0 var(--space-3);
+}
+.stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-2);
+  padding: var(--space-1) 0;
+  border-bottom: 1px dashed var(--border);
+}
+.stat:last-child { border-bottom: none; }
+.stat-label { color: var(--text-muted); }
+.stat-value { font-weight: 600; }
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+.btn {
+  appearance: none;
+  border: 1px solid var(--border);
+  background: var(--card-bg);
+  color: var(--text);
+  padding: .55rem 1.1rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-weight: 500;
+  font-size: .9rem;
+  transition: background-color .15s, border-color .15s, color .15s, transform .05s, opacity .15s, box-shadow .15s;
+}
+.btn:hover { background: var(--bg); }
+.btn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.btn:active { transform: translateY(1px); }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+.btn:disabled:hover { background: var(--card-bg); }
+.btn-primary {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0,0,0,.15);
+}
+.btn-primary:hover { background: var(--primary-hover); border-color: var(--primary-hover); box-shadow: 0 2px 6px rgba(0,0,0,.2); }
+.btn-danger { color: var(--danger); }
+.btn-danger:hover { background: var(--danger); color: #fff; border-color: var(--danger); }
+.btn-icon { padding: .35rem .6rem; line-height: 1; min-width: 2.25rem; }
+.btn-settings {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.2rem;
+  padding: .35rem;
+  cursor: pointer;
+  line-height: 1;
+  border-radius: 6px;
+  z-index: 5;
+  transition: color .2s, background .2s;
+}
+.btn-settings:hover { color: var(--text); background: var(--border); }
+.btn-success {
+  background: var(--success);
+  border-color: var(--success);
+  color: #fff;
+}
+.btn-success:hover { background: #239b56; border-color: #239b56; }
+
+.btn-grade-0 { background: #c0392b; border-color: #c0392b; color: #fff; }
+.btn-grade-0:hover { background: #a93226; border-color: #a93226; }
+.btn-grade-1 { background: #e67e22; border-color: #e67e22; color: #fff; }
+.btn-grade-1:hover { background: #ca6f1e; border-color: #ca6f1e; }
+.btn-grade-2 { background: #f39c12; border-color: #f39c12; color: #fff; }
+.btn-grade-2:hover { background: #d68910; border-color: #d68910; }
+.btn-grade-3 { background: #2ecc71; border-color: #2ecc71; color: #fff; }
+.btn-grade-3:hover { background: #27ae60; border-color: #27ae60; }
+.btn-grade-4 { background: #27ae60; border-color: #27ae60; color: #fff; }
+.btn-grade-4:hover { background: #1e8449; border-color: #1e8449; }
+.btn-grade-5 { background: #1e7e34; border-color: #1e7e34; color: #fff; }
+.btn-grade-5:hover { background: #196f2d; border-color: #196f2d; }
+.status-text {
+  color: var(--text-muted);
+  font-size: .875rem;
+  margin: 0 0 var(--space-3);
+  text-align: left;
+}
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin: var(--space-3) 0 var(--space-1);
+  font-weight: 600;
+  font-size: .8rem;
+  letter-spacing: .02em;
+  color: var(--text-muted);
+}
+.progress-header + .progress-header {
+  margin-top: var(--space-3);
+}
+.progress-bar {
+  height: 8px;
+  background: var(--bg);
+  border-radius: 999px;
+  overflow: hidden;
+  margin: 0 0 var(--space-1);
+}
+.streak-inline {
+  font-weight: 600;
+  font-size: .8rem;
+  color: var(--text-muted);
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), #5dade2);
+  border-radius: 999px;
+  transition: width .4s ease;
+}
+
+#study header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-1) 0;
+  flex-wrap: wrap;
+}
+#study header h2 {
+  flex: 1;
+  font-family: "Playfair Display", Georgia, "Times New Roman", serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+.header-meta { color: var(--text-muted); font-size: .8rem; font-weight: 500; }
+.badge {
+  background: var(--warning);
+  color: #fff;
+  padding: .125rem .5rem;
+  border-radius: 999px;
+  font-size: .7rem;
+  font-weight: 600;
+  letter-spacing: .02em;
+}
+
+.card-container {
+  perspective: 1000px;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2) 0;
+  min-height: 0;
+}
+.card {
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform .4s cubic-bezier(.4, 0, .2, 1);
+  width: 100%;
+  max-width: 640px;
+  height: 100%;
+  min-height: 200px;
+  max-height: 55vh;
+}
+.card:focus { outline: none; }
+.card:focus-visible { outline: 2px solid var(--primary); outline-offset: 4px; }
+.card.flipped { transform: rotateY(180deg); }
+.card.no-flip-transition { transition: none !important; }
+.card.leaving {
+  animation: card-leave 0.32s cubic-bezier(0.4, 0, 1, 1) forwards;
+  pointer-events: none;
+}
+.card.entering {
+  animation: card-enter 0.42s cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
+  pointer-events: none;
+}
+@keyframes card-leave {
+  from {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) rotateX(0) rotateY(0) rotateZ(0);
+  }
+  to {
+    opacity: 0;
+    transform:
+      translate3d(0, -130%, 0)
+      rotateX(var(--leave-rx, 6deg))
+      rotateY(var(--leave-ry, -4deg))
+      rotateZ(var(--leave-rz, -2deg));
+  }
+}
+@keyframes card-enter {
+  from {
+    opacity: 0;
+    transform:
+      translate3d(0, 110%, 0)
+      rotateX(var(--enter-rx, 8deg))
+      rotateY(var(--enter-ry, 5deg))
+      rotateZ(0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) rotateX(0) rotateY(0) rotateZ(0);
+  }
+}
+.card-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 16px var(--shadow);
+  padding: var(--space-5) var(--space-4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  overflow: auto;
+  word-break: break-word;
+}
+.card-front {
+  transform: rotateY(0deg);
+  font-size: 1.1rem;
+}
+.card-back { transform: rotateY(180deg); }
+
+.grades {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: var(--space-2);
+  padding: var(--space-2) 0;
+}
+.grades .btn {
+  padding: .6rem .25rem;
+  font-size: .8rem;
+  font-weight: 600;
+  letter-spacing: .01em;
+}
+
+.error {
+  background: var(--danger);
+  color: #fff;
+  padding: var(--space-3);
+  border-radius: var(--radius-sm);
+  margin: 0 0 var(--space-3);
+  font-size: .875rem;
+}
+.splash-footer {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: .7rem;
+  letter-spacing: .03em;
+}
+.splash-footer code { background: var(--border); padding: 0 .25rem; border-radius: 4px; }
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, .4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  animation: fade-in .15s ease;
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.modal {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 12px 40px var(--shadow);
+  max-width: 420px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  animation: modal-enter .2s ease;
+}
+@keyframes modal-enter {
+  from { opacity: 0; transform: translateY(8px) scale(.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-4);
+  border-bottom: 1px solid var(--border);
+}
+.modal-header h2 {
+  margin: 0;
+  font-size: 1.15rem;
+}
+.modal-body { padding: var(--space-4); }
+.settings-section { margin-bottom: var(--space-4); }
+.settings-section:last-child { margin-bottom: 0; }
+.settings-label {
+  font-weight: 600;
+  font-size: .7rem;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--text-muted);
+  margin-bottom: var(--space-1);
+}
+.settings-desc {
+  color: var(--text-muted);
+  font-size: .85rem;
+  margin: 0 0 var(--space-2);
+  text-align: left;
+  line-height: 1.5;
+}
+.btn-close-settings {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  line-height: 1;
+  padding: .15rem .55rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: color .15s, border-color .15s;
+}
+.btn-close-settings:hover { color: var(--danger); border-color: var(--danger); }
+
+@media (max-width: 640px) {
+  .view { padding: var(--space-2); }
+  .stats { grid-template-columns: 1fr; }
+  .panel { padding: var(--space-4) var(--space-3); }
+  .deck-icon { width: 28px; height: 28px; }
+  .grades { grid-template-columns: repeat(3, 1fr); }
+  .grades .btn { padding: .5rem .15rem; font-size: .75rem; }
+  .card { min-height: 160px; max-height: 50vh; }
+}
+
+@media (max-width: 420px) {
+  .grades { grid-template-columns: repeat(2, 1fr); }
+  .deck-icon { width: 24px; height: 24px; }
+  .title-row { gap: var(--space-2); }
+}
+
+@media (max-height: 600px) {
+  .card { max-height: 45vh; min-height: 120px; }
+  .card-container { padding: var(--space-1) 0; }
+  .card-face { padding: var(--space-3); }
+  #study { gap: var(--space-2); padding-top: var(--space-3); }
+  .grades { padding: var(--space-1) 0; }
+}
+</style>
 </head>
 <body>
   <noscript>
@@ -86,7 +748,7 @@
     <header>
       <button id="btn-close-session" class="btn btn-close" type="button" title="End session and return to splash" aria-label="End session">&times;</button>
       <h2 id="deck-title-study">Deck Title</h2>
-      <button id="btn-theme" class="btn btn-icon" type="button" title="Toggle theme (D)" aria-label="Toggle dark mode">🌙</button>
+      <button id="btn-theme" class="btn btn-icon" type="button" title="Toggle theme (D)" aria-label="Toggle dark mode">&#127769;</button>
       <span class="header-meta" role="status" aria-live="polite" id="progress-text">0/0 cards remaining (0 new)</span>
       <span id="rehearsal-badge" class="badge" hidden>Rehearsal</span>
     </header>
@@ -112,6 +774,1081 @@
     </div>
   </section>
 
-  <script src="assets/app.js"></script>
+<script>
+'use strict';
+
+const SCHEMA_VERSION = '1.0.0';
+const DAY_MS = 86400000;
+const GRADES = Object.freeze({ NoIdea: 0, Vague: 1, Almost: 2, Hard: 3, Good: 4, Easy: 5 });
+const SM2 = Object.freeze({
+  MIN_EASE: 1.3,
+  MAX_EASE: 2.5,
+  DEFAULT_EASE: 2.5,
+  INITIAL_INTERVAL: 1,
+  GRADUATING_INTERVAL: 6,
+});
+
+const appState = {
+  config: null,
+  cards: [],
+  cardHash: null,
+  engine: null,
+};
+
+function escapeHtml(text) {
+  return String(text).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
+}
+function today() { return Math.floor(Date.now() / DAY_MS); }
+function formatTime(ms) {
+  const totalSec = Math.max(0, Math.floor(ms / 1000));
+  const minutes = Math.floor(totalSec / 60);
+  const seconds = totalSec % 60;
+  return minutes + 'm ' + seconds + 's';
+}
+function simpleHash(str) {
+  let hash = 5381;
+  for (let i = 0; i < str.length; i++) {
+    hash = ((hash << 5) + hash) + str.charCodeAt(i);
+    hash = hash & hash;
+  }
+  return 'h' + Math.abs(hash).toString(36);
+}
+
+function key(name) {
+  const prefix = (appState.config && appState.config.storageKeyPrefix) || 'fc_';
+  return prefix + name;
+}
+function loadJSON(name, fallback) {
+  try {
+    const raw = localStorage.getItem(key(name));
+    if (raw == null) {
+      return fallback;
+    }
+    const parsed = JSON.parse(raw);
+    if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed) && fallback && !Array.isArray(fallback)) {
+      return { __corrupted: true, __raw: raw };
+    }
+    if (Array.isArray(fallback) && !Array.isArray(parsed) && typeof parsed === 'object') {
+      return { __corrupted: true, __raw: raw };
+    }
+    return parsed;
+  } catch (_) {
+    return { __corrupted: true, __raw: null };
+  }
+}
+function saveJSON(name, value) {
+  try {
+    localStorage.setItem(key(name), JSON.stringify(value));
+  } catch (error) {
+    if (error && (error.name === 'QuotaExceededError' || error.code === 22 || error.code === 1014)) {
+      throw new Error('Storage quota exceeded. Try resetting progress.');
+    }
+    throw error;
+  }
+}
+function defaultStats() {
+  return { totalReviews: 0, streakDays: 0, lastStudyDate: null, newCountToday: 0, dueCountToday: 0, lastDay: null };
+}
+function defaultSettings() {
+  return { darkMode: 'auto' };
+}
+function newMeta() {
+  return { created: Date.now(), version: SCHEMA_VERSION, cardHash: appState.cardHash };
+}
+function loadState() {
+  const cardsRaw = loadJSON('cards', []);
+  const statsRaw = loadJSON('stats', null);
+  const settingsRaw = loadJSON('settings', null);
+  const metaRaw = loadJSON('meta', null);
+  const isCorrupted = (cardsRaw && cardsRaw.__corrupted) ||
+                      (statsRaw && statsRaw.__corrupted) ||
+                      (settingsRaw && settingsRaw.__corrupted) ||
+                      (metaRaw && metaRaw.__corrupted);
+  if (isCorrupted) {
+    return {
+      cards: [],
+      stats: defaultStats(),
+      settings: defaultSettings(),
+      meta: newMeta(),
+      _corrupted: true,
+    };
+  }
+  return {
+    cards: Array.isArray(cardsRaw) ? cardsRaw : [],
+    stats: statsRaw && typeof statsRaw.totalReviews === 'number' ? statsRaw : defaultStats(),
+    settings: settingsRaw && typeof settingsRaw.darkMode === 'string' ? settingsRaw : defaultSettings(),
+    meta: (metaRaw && typeof metaRaw === 'object') ? metaRaw : null,
+    _corrupted: false,
+  };
+}
+function saveState(state) {
+  saveJSON('cards', state.cards);
+  saveJSON('stats', state.stats);
+  saveJSON('settings', state.settings);
+  saveJSON('meta', state.meta);
+}
+
+class DrillEngine {
+  constructor(config, state = {}) {
+    this.config = config;
+    this.cards = state.cards || [];
+    this.stats = state.stats || defaultStats();
+    this.settings = state.settings || defaultSettings();
+    this.meta = state.meta || newMeta();
+    this._corrupted = !!state._corrupted;
+    this.session = null;
+    this.rehearseMode = false;
+  }
+
+  getState() {
+    return { cards: this.cards, stats: this.stats, settings: this.settings, meta: this.meta };
+  }
+
+  static initCard() {
+    return { ease: SM2.DEFAULT_EASE, intervalDaysUntilNextReview: 0, repetitionsOfSuccess: 0, dueDateOfNextReview: today(), lapsesOfFailed: 0, lastReview: null, lastGrade: null, _bonus: false };
+  }
+
+  static freshCounts() {
+    return { reviewed: 0 };
+  }
+
+  applySM2(card, grade) {
+    const todayValue = today();
+    if (grade < 3) {
+      card.repetitionsOfSuccess = 0;
+      card.intervalDaysUntilNextReview = SM2.INITIAL_INTERVAL;
+      card.lapsesOfFailed = (card.lapsesOfFailed || 0) + 1;
+    } else {
+      if (card.repetitionsOfSuccess === 0) {
+        card.intervalDaysUntilNextReview = SM2.INITIAL_INTERVAL;
+      } else if (card.repetitionsOfSuccess === 1) {
+        card.intervalDaysUntilNextReview = SM2.GRADUATING_INTERVAL;
+      } else {
+        card.intervalDaysUntilNextReview = Math.round(card.intervalDaysUntilNextReview * card.ease);
+      }
+      card.repetitionsOfSuccess = (card.repetitionsOfSuccess || 0) + 1;
+    }
+    card.ease = Math.min(SM2.MAX_EASE, Math.max(SM2.MIN_EASE, card.ease + (0.1 - (5 - grade) * (0.08 + (5 - grade) * 0.02))));
+    card.dueDateOfNextReview = todayValue + card.intervalDaysUntilNextReview;
+    card.lastReview = todayValue;
+    card.lastGrade = grade;
+    return card;
+  }
+
+  getDueCards(t) {
+    const indices = [];
+    this.cards.forEach((card, i) => {
+      if (card.lastReview !== null && card.dueDateOfNextReview <= t) {
+        indices.push(i);
+      }
+    });
+    return indices.sort((a, b) => this.cards[a].dueDateOfNextReview - this.cards[b].dueDateOfNextReview);
+  }
+
+  getNewCards(limit) {
+    const indices = [];
+    this.cards.forEach((card, i) => {
+      if (card.repetitionsOfSuccess === 0 && card.lastReview === null && !card._bonus) {
+        indices.push(i);
+      }
+    });
+    return indices.slice(0, limit);
+  }
+
+  getTodayCardSummary() {
+    const t = today();
+    const doneIds = new Set();
+    const failedSet = new Set();
+    let reviewedCount = 0;
+    this.cards.forEach((card, i) => {
+      if (card.lastReview !== t) {
+        return;
+      }
+      reviewedCount++;
+      if ((card.lastGrade || 0) >= 4) {
+        doneIds.add(i);
+      } else {
+        failedSet.add(i);
+      }
+    });
+    const failedIds = [...failedSet];
+    const dueIndices = this.getDueCards(t).filter(i => !doneIds.has(i));
+    const dueLimit = Math.max(0, this.config.dailyDueCardsLimit - (this.stats.dueCountToday || 0));
+    const dueIds = dueIndices.slice(0, dueLimit);
+    const newLeft = Math.max(0, this.config.dailyNewLimit - (this.stats.newCountToday || 0));
+    const newIds = this.getNewCards(newLeft);
+    const seen = new Set();
+    const workIds = [];
+    [...failedIds, ...dueIds, ...newIds].forEach(id => {
+      if (!seen.has(id)) {
+        seen.add(id);
+        workIds.push(id);
+      }
+    });
+    return { workIds, workCount: workIds.length, doneCount: doneIds.size, failedCount: failedIds.length, dueCount: dueIds.length, newCount: newIds.length, newLeft, reviewedCount };
+  }
+
+  enqueueItem(queue, id, availableAt) {
+    queue.push({ id, availableAt: availableAt || Date.now() });
+  }
+
+  initDrillSession(cardIds) {
+    const queue = [];
+    const now = Date.now();
+    cardIds.forEach(id => {
+      this.enqueueItem(queue, id, now);
+    });
+    this.session = {
+      queue,
+      current: null,
+      counts: DrillEngine.freshCounts(),
+      startedAt: now,
+      resolvedIds: new Set(),
+      totalCards: cardIds.length,
+    };
+  }
+
+  sessionMaxReviews() {
+    return (this.config && this.config.maxReviewsPerSession) || 100;
+  }
+
+  shouldEndSession() {
+    if (!this.session) {
+      return true;
+    }
+    if (this.session.resolvedIds.size >= this.session.totalCards) {
+      return true;
+    }
+    if (this.session.counts.reviewed >= this.sessionMaxReviews()) {
+      return true;
+    }
+    return false;
+  }
+
+  getNextCard() {
+    if (this.shouldEndSession()) return null;
+
+    const now = Date.now();
+    const waiting = [];
+
+    while (this.session.queue.length > 0) {
+      const entry = this.session.queue.shift();
+      const card = this.cards[entry.id];
+      if (!card || this.session.resolvedIds.has(entry.id)) continue;
+
+      if (entry.availableAt <= now) {
+        this.session.queue.push(...waiting);
+        return { card, id: entry.id };
+      }
+
+      waiting.push({ card, entry });
+    }
+
+    if (waiting.length > 0) {
+      const { card, entry } = waiting.shift();
+      this.session.queue.push(...waiting);
+      return { card, id: entry.id };
+    }
+
+    return null;
+  }
+
+  recordGrade(cardId, grade) {
+    const card = this.cards[cardId];
+    if (!card) {
+      return;
+    }
+    const wasNew = card.repetitionsOfSuccess === 0 && card.lastReview === null;
+    const wasReviewedToday = card.lastReview === today();
+
+    if (!this.rehearseMode) {
+      this.applySM2(card, grade);
+      this.cards[cardId] = card;
+    }
+
+    this.session.counts.reviewed++;
+
+    if (grade >= GRADES.Good) {
+      this.session.resolvedIds.add(cardId);
+    } else {
+      const TIMING_KEY = {
+        [GRADES.NoIdea]: 'noidea',
+        [GRADES.Vague]: 'vague',
+        [GRADES.Almost]: 'almost',
+        [GRADES.Hard]: 'hard',
+        [GRADES.Good]: 'good',
+        [GRADES.Easy]: 'easy',
+      };
+      const delay = (this.config.gradeTimings && this.config.gradeTimings[TIMING_KEY[grade]]) || 0;
+      this.enqueueItem(this.session.queue, cardId, Date.now() + delay * 1000);
+    }
+
+    if (!this.rehearseMode) {
+      if (wasNew && grade >= 3) {
+        this.stats.newCountToday = (this.stats.newCountToday || 0) + 1;
+      }
+      if (!wasNew && !wasReviewedToday) {
+        this.stats.dueCountToday = (this.stats.dueCountToday || 0) + 1;
+      }
+      this.stats.totalReviews++;
+      const todayValue = today();
+      const last = this.stats.lastStudyDate;
+      if (last === todayValue) {
+      } else if (last === todayValue - 1) {
+        this.stats.streakDays = (this.stats.streakDays || 0) + 1;
+      } else {
+        this.stats.streakDays = 1;
+      }
+      this.stats.lastStudyDate = todayValue;
+      this.stats.lastDay = todayValue;
+    }
+  }
+
+  computeSplashStats() {
+    const cardSummary = this.getTodayCardSummary();
+    const streak = this.stats.streakDays || 0;
+    const reviewedExists = this.cards.some(card => card.lastReview !== null);
+    const todayTotal = cardSummary.doneCount + cardSummary.workCount;
+    const completedPct = todayTotal > 0 ? Math.round((cardSummary.reviewedCount / todayTotal) * 100) : 0;
+    let state, canStart = false;
+    if (cardSummary.reviewedCount >= todayTotal && todayTotal > 0) {
+      state = 'completed';
+      canStart = reviewedExists;
+    } else if (cardSummary.workCount > 0) {
+      state = cardSummary.reviewedCount > 0 ? 'interrupted' : 'not_started';
+      canStart = true;
+    } else {
+      state = 'not_started';
+    }
+    const overallReviewed = this.cards.filter(card => (card.lastGrade || 0) >= 4).length;
+    const overallTotal = this.cards.length;
+    const overallPct = overallTotal > 0 ? Math.round((overallReviewed / overallTotal) * 100) : 0;
+    return { state, completedPct, remaining: cardSummary.workCount, streak, totalReviews: this.stats.totalReviews, canStart, reviewedExists, newLeft: cardSummary.newLeft, reviewedToday: cardSummary.reviewedCount, todayTotal, overallReviewed, overallTotal, overallPct };
+  }
+
+  resetProgress(cardCount) {
+    this.cards = Array.from({ length: cardCount }, () => DrillEngine.initCard());
+    this.stats.newCountToday = 0;
+    this.stats.dueCountToday = 0;
+    this.stats.streakDays = 0;
+    this.stats.lastDay = today();
+    this.meta = newMeta();
+    this._corrupted = false;
+    this._justReset = true;
+  }
+
+  migrateState(cardHash, cardCount) {
+    const def = defaultStats();
+    for (const key of Object.keys(def)) {
+      if (!(key in this.stats)) {
+        this.stats[key] = def[key];
+      }
+    }
+    if (!this.meta || this.meta.cardHash !== cardHash || this.cards.length !== cardCount) {
+      this.cards = Array.from({ length: cardCount }, () => DrillEngine.initCard());
+      this.meta = Object.assign({}, newMeta(), { created: (this.meta && this.meta.created) || Date.now() });
+    }
+    const todayValue = today();
+    if (this.stats.lastDay !== todayValue) {
+      this._isNewDay = true;
+      this.stats.newCountToday = 0;
+      this.stats.dueCountToday = 0;
+      this.stats.lastDay = todayValue;
+    }
+  }
+}
+
+class StatusMessageManager {
+  constructor() {
+    this._animTimer = null;
+  }
+
+  static get MESSAGES() {
+    return {
+      welcomeFirst: [
+        '\uD83D\uDC4B Welcome to Flashcards! Ready to learn your first cards?',
+        '\uD83C\uDF1F Let\u2019s get started! Your deck of {n} cards is waiting.',
+        '\uD83C\uDFAF New here? Let\u2019s dive into your first study session!',
+      ],
+      welcomeReset: [
+        '\uD83D\uDD04 Fresh start! All progress has been reset.',
+        '\u2728 Clean slate! Ready to begin again?',
+        '\uD83D\uDDD1\uFE0F Progress cleared! Time to build a new streak.',
+      ],
+      welcomeBack: [
+        '\uD83D\uDE80 Welcome back! {n} cards to study today.',
+        '\uD83D\uDC4B Good to see you! You have {n} cards waiting.',
+        '\uD83D\uDCDA Ready to study? {n} cards are due today.',
+      ],
+      notStarted: [
+        'Your today\u2019s deck: {n} cards ({new} new)',
+        'You have {n} cards to study today ({new} new)',
+        '{n} cards waiting for you ({new} new to learn)',
+      ],
+      noCardsDue: [
+        'No cards due \u2014 add more cards to get started.',
+        'All caught up! No cards waiting today.',
+        'Nothing to study right now \u2014 time to add more cards!',
+      ],
+      interrupted: [
+        'Your today\u2019s deck: {n} cards remaining ({new} new)',
+        'Keep going! {n} cards left ({new} new)',
+        '{n} more cards to go ({new} new) \u2014 you\u2019ve got this!',
+      ],
+      allReviewed: [
+        'All reviewed for today.',
+        'You\u2019ve seen everything due today \u2014 nice work!',
+        'All done for now! Great session.',
+      ],
+      todayComplete: [
+        'Today\u2019s deck complete \u2014 You can continue tomorrow! \u2705',
+        'You finished today\u2019s cards! Come back tomorrow for more cards? \u2705',
+        'All today\u2019s cards done! More will await you tomorrow! \u2705',
+      ],
+      deckMastered: [
+        '\uD83C\uDF89 Entire deck mastered! All cards complete! \uD83C\uDF89',
+        '\uD83C\uDF1F You did it! Every card mastered! \uD83C\uDF1F',
+        '\uD83C\uDFC6 100% complete! You\u2019ve mastered the whole deck! \uD83C\uDFC6',
+      ],
+    };
+  }
+
+  static _pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+  getMessage(engine) {
+    const splashStats = engine.computeSplashStats();
+    const stats = engine.stats;
+
+    if (engine._justReset) {
+      engine._justReset = false;
+      return StatusMessageManager._pick(StatusMessageManager.MESSAGES.welcomeReset);
+    }
+    if (stats.totalReviews === 0 && stats.lastStudyDate === null) {
+      return StatusMessageManager._pick(StatusMessageManager.MESSAGES.welcomeFirst)
+        .replace('{n}', engine.cards.length);
+    }
+    if (engine._isNewDay) {
+      engine._isNewDay = false;
+      return StatusMessageManager._pick(StatusMessageManager.MESSAGES.welcomeBack)
+        .replace('{n}', splashStats.remaining);
+    }
+
+    if (splashStats.state === 'not_started') {
+      if (splashStats.canStart) {
+        return StatusMessageManager._pick(StatusMessageManager.MESSAGES.notStarted)
+          .replace('{n}', splashStats.remaining).replace('{new}', splashStats.newLeft);
+      }
+      return StatusMessageManager._pick(StatusMessageManager.MESSAGES.noCardsDue);
+    }
+    if (splashStats.state === 'interrupted') {
+      if (splashStats.remaining > 0) {
+        return StatusMessageManager._pick(StatusMessageManager.MESSAGES.interrupted)
+          .replace('{n}', splashStats.remaining).replace('{new}', splashStats.newLeft);
+      }
+      return StatusMessageManager._pick(StatusMessageManager.MESSAGES.allReviewed);
+    }
+    if (splashStats.overallPct === 100) {
+      return StatusMessageManager._pick(StatusMessageManager.MESSAGES.deckMastered);
+    }
+    return StatusMessageManager._pick(StatusMessageManager.MESSAGES.todayComplete);
+  }
+
+  typewrite(el, text, delay) {
+    this.cancel();
+    el.textContent = '';
+    const chars = [...text];
+    let i = 0;
+    this._animTimer = setInterval(() => {
+      if (i >= chars.length) {
+        this.cancel();
+        return;
+      }
+      el.textContent += chars[i];
+      i++;
+    }, delay || 30);
+  }
+
+  cancel() {
+    if (this._animTimer) {
+      clearInterval(this._animTimer);
+      this._animTimer = null;
+    }
+  }
+}
+
+function renderSplash() {
+  const splashStats = appState.engine.computeSplashStats();
+  document.getElementById('deck-title').textContent = appState.config.deckTitle;
+  document.getElementById('splash-card-count').textContent = appState.cards.length;
+  document.getElementById('footer-title').textContent = appState.config.appName || appState.config.deckTitle;
+  document.getElementById('footer-version').textContent = appState.config.version ? 'v' + appState.config.version : 'v' + (appState.engine.meta.version || SCHEMA_VERSION);
+
+  const corrupted = !!appState.engine._corrupted;
+  document.getElementById('corrupted-msg').hidden = !corrupted;
+
+  const progressFill = document.getElementById('progress-fill');
+  const progressBar = document.querySelector('.progress-bar');
+  progressFill.style.width = splashStats.completedPct + '%';
+  if (progressBar) {
+    progressBar.setAttribute('aria-valuenow', splashStats.completedPct);
+  }
+
+  document.getElementById('splash-progress-text').textContent = splashStats.reviewedToday + '/' + splashStats.todayTotal + ' cards';
+  document.getElementById('splash-streak-text').textContent = splashStats.streak;
+  document.getElementById('splash-completed-text').textContent = splashStats.overallPct + '% completed';
+  const desc = document.getElementById('deck-description');
+  if (appState.config.deckDescription) {
+    desc.textContent = appState.config.deckDescription;
+    desc.hidden = false;
+  } else {
+    desc.hidden = true;
+  }
+
+  const statusText = document.getElementById('splash-status-text');
+  appState.msgManager.typewrite(statusText, appState.msgManager.getMessage(appState.engine));
+
+  const start = document.getElementById('btn-start');
+  start.hidden = corrupted || (!splashStats.canStart || splashStats.state === 'completed');
+  start.className = 'btn btn-primary';
+  if (splashStats.state === 'interrupted') {
+    start.textContent = 'Resume Studying';
+  } else {
+    start.textContent = 'Start Studying';
+  }
+  document.getElementById('btn-settings-rehearse').disabled = !splashStats.reviewedExists;
+  const hasUnseen = appState.engine.cards.some(card => card.lastReview === null && card.repetitionsOfSuccess === 0);
+  document.getElementById('settings-add-more-section').hidden = !(splashStats.state === 'completed' && hasUnseen);
+}
+
+function openSettings() {
+  document.getElementById('settings-backdrop').hidden = false;
+  const firstBtn = document.querySelector('#settings-backdrop .btn, #settings-backdrop .btn-close-settings');
+  if (firstBtn) {
+    firstBtn.focus({ preventScroll: true });
+  }
+}
+function closeSettings() {
+  document.getElementById('settings-backdrop').hidden = true;
+  const gear = document.getElementById('btn-settings');
+  if (gear) {
+    gear.focus({ preventScroll: true });
+  }
+}
+
+function startSession() {
+  if (appState.engine._corrupted) {
+    return;
+  }
+  appState.engine.rehearseMode = false;
+  const { workIds } = appState.engine.getTodayCardSummary();
+  appState.engine.initDrillSession(workIds);
+  document.getElementById('rehearsal-badge').hidden = true;
+  showView('study');
+  if (workIds.length === 0) {
+    endSession();
+    return;
+  }
+  nextCard();
+}
+
+function shuffleArray(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function startNewCardRehearsal() {
+  appState.engine.rehearseMode = true;
+  const fresh = appState.engine.cards.map((card, i) => card.repetitionsOfSuccess === 0 && card.lastReview === null ? i : -1).filter(i => i !== -1);
+  const ids = shuffleArray(fresh);
+  appState.engine.initDrillSession(ids);
+  document.getElementById('rehearsal-badge').hidden = false;
+  showView('study');
+  if (ids.length === 0) {
+    endSession();
+    return;
+  }
+  nextCard();
+}
+
+function startAlreadyReviewedRehearsal() {
+  const limit = appState.config.maxCardsToRehearse || 10;
+  const ids = shuffleArray(
+    appState.engine.cards
+      .map((card, i) => ({ card, i }))
+      .filter(({ card }) => card.lastReview !== null)
+      .sort((a, b) => a.card.ease - b.card.ease)
+      .slice(0, limit)
+      .map(({ i }) => i)
+  );
+  if (ids.length === 0) {
+    return;
+  }
+  appState.engine.rehearseMode = true;
+  appState.engine.initDrillSession(ids);
+  document.getElementById('rehearsal-badge').hidden = false;
+  showView('study');
+  nextCard();
+}
+
+function addMoreCards() {
+  const limit = appState.config.extraCardsOnComplete || 5;
+  const todayValue = today();
+  const cards = appState.engine.cards;
+  let added = 0;
+  for (let i = 0; i < cards.length && added < limit; i++) {
+    const card = cards[i];
+    if (card.lastReview === null && card.repetitionsOfSuccess === 0 && !card._bonus) {
+      card.lastReview = todayValue - 1;
+      card.dueDateOfNextReview = todayValue - 1;
+      card._bonus = true;
+      added++;
+    }
+  }
+  if (added === 0) {
+    return;
+  }
+  appState.engine.stats.dueCountToday = Math.max(0, (appState.engine.stats.dueCountToday || 0) - added);
+  saveState(appState.engine.getState());
+  renderSplash();
+}
+
+function renderCardContent(id) {
+  const data = appState.cards[id];
+  const front = data ? data.question : '<em>(missing card content)</em>';
+  const back = data ? data.answer : '<em>(missing card content)</em>';
+  document.getElementById('card-front-content').innerHTML = '<span>' + front + '</span>';
+  document.getElementById('card-back-question').innerHTML = '<span>' + front + '</span>';
+  document.getElementById('card-back-answer').innerHTML = back;
+}
+
+function resetCardToFrontInstant() {
+  const card = document.getElementById('card');
+  card.classList.add('no-flip-transition');
+  card.classList.remove('flipped');
+  card.setAttribute('aria-label', 'Flashcard (press Space to flip)');
+  document.getElementById('card-front').setAttribute('aria-hidden', 'false');
+  document.getElementById('card-back').setAttribute('aria-hidden', 'true');
+  const grades = document.getElementById('grades');
+  grades.classList.add('hidden');
+  document.getElementById('btn-show-answer').hidden = false;
+  void card.offsetWidth;
+  card.classList.remove('no-flip-transition');
+}
+
+function clearCardSwapVars(el) {
+  el.style.removeProperty('--leave-rx');
+  el.style.removeProperty('--leave-ry');
+  el.style.removeProperty('--leave-rz');
+  el.style.removeProperty('--enter-rx');
+  el.style.removeProperty('--enter-ry');
+  el.style.removeProperty('transform');
+  el.style.removeProperty('opacity');
+}
+
+function setRandomLeaveRotation(el) {
+  const rx = (Math.random() * 16 - 8).toFixed(1);
+  const ry = (Math.random() * 16 - 8).toFixed(1);
+  const rz = (Math.random() * 8 - 4).toFixed(1);
+  el.style.setProperty('--leave-rx', `${rx}deg`);
+  el.style.setProperty('--leave-ry', `${ry}deg`);
+  el.style.setProperty('--leave-rz', `${rz}deg`);
+}
+
+function setRandomEnterRotation(el) {
+  const rx = (Math.random() * 16 - 8).toFixed(1);
+  const ry = (Math.random() * 16 - 8).toFixed(1);
+  el.style.setProperty('--enter-rx', `${rx}deg`);
+  el.style.setProperty('--enter-ry', `${ry}deg`);
+}
+
+function playLeaveAnimation(cardEl, done) {
+  setRandomLeaveRotation(cardEl);
+  let called = false;
+  const finish = () => {
+    if (called) {
+      return;
+    }
+    called = true;
+    cardEl.removeEventListener('animationend', onEnd);
+    cardEl.classList.remove('leaving');
+    done();
+  };
+  const onEnd = (e) => {
+    if (e.animationName === 'card-leave') {
+      finish();
+    }
+  };
+  cardEl.addEventListener('animationend', onEnd);
+  cardEl.classList.add('leaving');
+  setTimeout(finish, 380);
+}
+
+function playEnterAnimation(cardEl, done) {
+  setRandomEnterRotation(cardEl);
+  let called = false;
+  const finish = () => {
+    if (called) {
+      return;
+    }
+    called = true;
+    cardEl.removeEventListener('animationend', onEnd);
+    cardEl.classList.remove('entering');
+    clearCardSwapVars(cardEl);
+    done();
+  };
+  const onEnd = (e) => {
+    if (e.animationName === 'card-enter') {
+      finish();
+    }
+  };
+  cardEl.addEventListener('animationend', onEnd);
+  cardEl.classList.add('entering');
+  setTimeout(finish, 480);
+}
+
+function cancelCardAnimations(cardEl) {
+  cardEl.classList.remove('leaving', 'entering', 'no-flip-transition');
+  clearCardSwapVars(cardEl);
+}
+
+function flipCard() {
+  const card = document.getElementById('card');
+  if (card.classList.contains('flipped')) {
+    return;
+  }
+  if (card.classList.contains('leaving') || card.classList.contains('entering')) {
+    cancelCardAnimations(card);
+    card.style.opacity = '1';
+  }
+  card.classList.add('flipped');
+  const grades = document.getElementById('grades');
+  grades.classList.remove('hidden');
+  document.getElementById('btn-show-answer').hidden = true;
+  card.setAttribute('aria-label', 'Flashcard flipped (press 1-6 to grade)');
+  document.getElementById('card-front').setAttribute('aria-hidden', 'true');
+  document.getElementById('card-back').setAttribute('aria-hidden', 'false');
+  const firstGrade = grades.querySelector('.btn');
+  if (firstGrade) {
+    firstGrade.focus({ preventScroll: true });
+  }
+}
+
+function nextCard() {
+  const result = appState.engine.getNextCard();
+  if (result === null) {
+    endSession();
+    return;
+  }
+  const card = result.card;
+  const cardEl = document.getElementById('card');
+  const hadPrev = appState.engine.session.current !== null;
+  appState.engine.session.current = result.id;
+
+  const onEnterDone = () => {
+    updateProgress();
+    try { cardEl.focus({ preventScroll: true }); } catch (_) {}
+  };
+
+  const showNewCard = () => {
+    cancelCardAnimations(cardEl);
+    cardEl.style.opacity = '0';
+    resetCardToFrontInstant();
+    renderCardContent(result.id);
+    playEnterAnimation(cardEl, onEnterDone);
+  };
+
+  if (hadPrev) {
+    playLeaveAnimation(cardEl, showNewCard);
+  } else {
+    showNewCard();
+  }
+}
+
+function updateProgress() {
+  const session = appState.engine.session;
+  if (!session) {
+    return;
+  }
+  const total = session.totalCards;
+  const completed = session.resolvedIds.size || 0;
+  document.getElementById('progress-text').textContent = completed + '/' + total + ' completed';
+}
+
+function gradeCurrent(grade) {
+  if (!appState.engine.session || appState.engine.session.current === null) {
+    return;
+  }
+  const cardId = appState.engine.session.current;
+  if (!document.getElementById('card').classList.contains('flipped')) {
+    flipCard();
+    return;
+  }
+  appState.engine.recordGrade(cardId, grade);
+  saveState(appState.engine.getState());
+  updateProgress();
+  nextCard();
+}
+
+function endSession() {
+  const cardEl = document.getElementById('card');
+  if (cardEl) {
+    cancelCardAnimations(cardEl);
+  }
+
+  appState.engine.rehearseMode = false;
+  appState.engine.session = null;
+  saveState(appState.engine.getState());
+  showView('splash');
+  renderSplash();
+  const start = document.getElementById('btn-start');
+  if (start) {
+    start.focus({ preventScroll: true });
+  }
+}
+
+function backToSplash() {
+  appState.engine.rehearseMode = false;
+  appState.engine.session = null;
+  const cardEl = document.getElementById('card');
+  if (cardEl) {
+    cancelCardAnimations(cardEl);
+  }
+  showView('splash');
+  renderSplash();
+  const start = document.getElementById('btn-start');
+  if (start) {
+    start.focus({ preventScroll: true });
+  }
+}
+
+function confirmReset() {
+  const ok = confirm('Reset all progress?\n\nAll card progress will be cleared and daily counters reset. Streak will be reset. Total reviews will be kept.\n\nThis cannot be undone.');
+  if (!ok) {
+    return;
+  }
+  appState.engine.resetProgress(appState.cards.length);
+  saveState(appState.engine.getState());
+  renderSplash();
+  const start = document.getElementById('btn-start');
+  if (start) {
+    start.focus({ preventScroll: true });
+  }
+}
+
+function effectiveDark() {
+  const settings = (appState.engine && appState.engine.settings) || defaultSettings();
+  if (settings.darkMode === 'dark') {
+    return true;
+  }
+  if (settings.darkMode === 'light') {
+    return false;
+  }
+  return window.matchMedia('(prefers-color-scheme: dark)').matches;
+}
+
+function applyTheme() {
+  const root = document.documentElement;
+  const dark = effectiveDark();
+  root.classList.toggle('dark', dark);
+  root.classList.toggle('light', !dark && appState.engine.settings.darkMode === 'light');
+  const btn = document.getElementById('btn-theme');
+  if (btn) {
+    btn.textContent = dark ? '\u2600\uFE0F' : '\uD83C\uDF19';
+  }
+  const themeBtn = document.getElementById('btn-settings-theme');
+  if (themeBtn) {
+    const mode = appState.engine.settings.darkMode || 'auto';
+    themeBtn.textContent = mode.charAt(0).toUpperCase() + mode.slice(1);
+  }
+}
+
+function cycleTheme() {
+  if (!appState.engine) {
+    return;
+  }
+  const current = appState.engine.settings.darkMode || 'auto';
+  const next = current === 'auto' ? 'light' : current === 'light' ? 'dark' : 'auto';
+  appState.engine.settings.darkMode = next;
+  saveState(appState.engine.getState());
+  applyTheme();
+}
+
+function showView(name) {
+  ['splash', 'study'].forEach(id => {
+    document.getElementById(id).classList.toggle('active', id === name);
+  });
+}
+
+function showError(msg) {
+  const splash = document.getElementById('splash');
+  splash.innerHTML = '<div class="panel"><h1>\u26A0\uFE0F Error</h1><div class="error">' + escapeHtml(msg) + '</div><p>Open the browser DevTools console for details.</p></div>';
+  showView('splash');
+}
+
+function wireEvents() {
+  document.getElementById('btn-start').addEventListener('click', startSession);
+  document.getElementById('btn-settings-rehearse').addEventListener('click', function() {
+    closeSettings();
+    startAlreadyReviewedRehearsal();
+  });
+  document.getElementById('btn-theme').addEventListener('click', cycleTheme);
+  document.getElementById('btn-close-session').addEventListener('click', backToSplash);
+  document.getElementById('btn-settings').addEventListener('click', openSettings);
+  document.getElementById('btn-close-settings').addEventListener('click', closeSettings);
+  document.getElementById('settings-backdrop').addEventListener('click', function(e) {
+    if (e.target === this) {
+      closeSettings();
+    }
+  });
+  document.getElementById('btn-settings-theme').addEventListener('click', cycleTheme);
+  document.getElementById('btn-settings-add-more').addEventListener('click', function() {
+    closeSettings();
+    addMoreCards();
+  });
+  document.getElementById('btn-settings-reset').addEventListener('click', function() {
+    closeSettings();
+    confirmReset();
+  });
+
+  [GRADES.NoIdea, GRADES.Vague, GRADES.Almost, GRADES.Hard, GRADES.Good, GRADES.Easy].forEach(grade => {
+    document.getElementById('grade-' + grade).addEventListener('click', () => gradeCurrent(grade));
+  });
+
+  document.getElementById('btn-show-answer').addEventListener('click', flipCard);
+
+  const cardEl = document.getElementById('card');
+  cardEl.addEventListener('keydown', (e) => {
+    if (e.key === ' ' || e.key === 'Enter') {
+      e.preventDefault();
+      flipCard();
+    }
+  });
+
+  document.addEventListener('keydown', handleKeydown);
+}
+
+function handleKeydown(e) {
+  const target = e.target;
+  if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) {
+    return;
+  }
+  if (e.metaKey || e.ctrlKey || e.altKey) {
+    return;
+  }
+
+  if (e.key === 'Escape') {
+    if (!document.getElementById('settings-backdrop').hidden) {
+      e.preventDefault();
+      closeSettings();
+      return;
+    }
+    if (document.getElementById('study').classList.contains('active')) {
+      e.preventDefault();
+      backToSplash();
+    }
+    return;
+  }
+
+  const splashActive = document.getElementById('splash').classList.contains('active');
+  const studyActive = document.getElementById('study').classList.contains('active');
+
+  if (splashActive) {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      startSession();
+    }
+    return;
+  }
+  if (studyActive) {
+    if (e.key === ' ' || e.key === 'Enter') {
+      e.preventDefault();
+      flipCard();
+      return;
+    }
+    if (e.key === '1') {
+      e.preventDefault();
+      gradeCurrent(GRADES.NoIdea);
+      return;
+    }
+    if (e.key === '2') {
+      e.preventDefault();
+      gradeCurrent(GRADES.Vague);
+      return;
+    }
+    if (e.key === '3') {
+      e.preventDefault();
+      gradeCurrent(GRADES.Almost);
+      return;
+    }
+    if (e.key === '4') {
+      e.preventDefault();
+      gradeCurrent(GRADES.Hard);
+      return;
+    }
+    if (e.key === '5') {
+      e.preventDefault();
+      gradeCurrent(GRADES.Good);
+      return;
+    }
+    if (e.key === '6') {
+      e.preventDefault();
+      gradeCurrent(GRADES.Easy);
+      return;
+    }
+    if (e.key === 'd' || e.key === 'D') {
+      e.preventDefault();
+      cycleTheme();
+      return;
+    }
+  }
+}
+
+function main() {
+  try {
+    appState.config = APP_CONFIG;
+    appState.cards = CARDS;
+    appState.cardHash = simpleHash(JSON.stringify(CARDS));
+
+    let srsState = loadState();
+    if (srsState._corrupted) {
+      srsState = {
+        cards: CARDS.map(() => DrillEngine.initCard()),
+        stats: defaultStats(),
+        settings: defaultSettings(),
+        meta: newMeta(),
+        _corrupted: true,
+      };
+    }
+    appState.engine = new DrillEngine(APP_CONFIG, srsState);
+    appState.engine.migrateState(appState.cardHash, CARDS.length);
+    saveState(appState.engine.getState());
+
+    document.getElementById('deck-title').textContent = APP_CONFIG.deckTitle;
+    document.getElementById('deck-title-study').textContent = APP_CONFIG.deckTitle;
+    document.title = APP_CONFIG.deckTitle;
+
+    appState.msgManager = new StatusMessageManager();
+    applyTheme();
+    wireEvents();
+    showView('splash');
+    renderSplash();
+
+    console.info('%cFlashcards ready: ' + APP_CONFIG.deckTitle + ' v' + appState.engine.meta.version + ' (' + CARDS.length + ' cards)',
+      'color: #0b79d0; font-weight: bold;');
+  } catch (error) {
+    console.error('[flashcards] startup error:', error);
+    showError((error && error.message) ? error.message : 'An unexpected error occurred.');
+  }
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', main);
+} else {
+  main();
+}
+</script>
 </body>
 </html>
